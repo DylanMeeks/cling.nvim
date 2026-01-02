@@ -86,6 +86,18 @@ You can define custom wrappers for your CLI tools in the `setup` function. Wrapp
     *   Points to a URL serving a raw Bash completion script. The plugin will `curl` this file.
     *   *Best for:* Tools where you want to fetch the latest completions directly from the repository without manual installation.
 
+### Caching & Updates
+
+To optimize performance, `cling.nvim` parses and caches the generated completions in `stdpath("data")/cling/completions/<binary>.lua`.
+
+These cached files are loaded on subsequent startups to avoid expensive re-parsing. If you update the underlying CLI tool or want to refresh the completions, you can force a re-parse by passing the `--reparse-completions` flag to your wrapper command:
+
+```vim
+:<WrapperCommand> --reparse-completions
+```
+
+You can also manually add completions if you want as they are all just `.lua` files that export a table.
+
 ## Examples
 
 ### Wrapping Jujutsu (jj) with custom keymaps
