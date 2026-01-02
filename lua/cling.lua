@@ -115,15 +115,45 @@ local function generate_completion(wrapper, force)
     return { flags = {}, subcommands = {} }
 end
 
+--- Prompts for an environment file and sets it for the next command.
+function M.with_env()
+    local env_file = vim.fn.input('Path to .env file: ', core.last_env or vim.fs.joinpath(vim.fn.getcwd(), ".env"), 'file')
+    if env_file == nil or env_file == "" then
+        vim.notify("Cancelled", vim.log.levels.WARN)
+        return
+    end
+    core.last_env = env_file
+    M.on_cli_command({ fargs = {} })
+end
+
+--- Re-runs the last executed command.
+function M.run_last()
+    if core.last_cmd then
+        core.executor(core.last_cmd, core.last_cwd or vim.fn.getcwd())
+    else
+        vim.notify("No previous command executed", vim.log.levels.WARN)
+    end
+end
+
 --- Handles the generic Cling command execution.
 --- @param args table Command arguments (fargs).
 function M.on_cli_command(args)
     local fargs = args.fargs
     if #fargs == 0 then
         local cmd = vim.fn.input("Cling command: ", core.last_cmd or "")
-        if cmd ~= "" then
-            core.executor(cmd, core.last_cwd or vim.fn.getcwd())
+        if cmd == nil or cmd == "" then
+            vim.notify("Cancelled", vim.log.levels.WARN)
+            return
         end
+
+        local default_cwd = core.last_cwd or vim.fn.getcwd()
+        local cwd = vim.fn.input("CWD: ", default_cwd, "dir")
+        if cwd == nil or cwd == "" then
+            vim.notify("Cancelled", vim.log.levels.WARN)
+            return
+        end
+
+        core.executor(cmd, cwd)
         return
     end
 
