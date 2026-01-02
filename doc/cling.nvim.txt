@@ -3,23 +3,31 @@
 ==============================================================================
 Table of Contents                               *cling.nvim-table-of-contents*
 
-1. cling.nvim                                          |cling.nvim-cling.nvim|
-  - Installation                          |cling.nvim-cling.nvim-installation|
-  - Usage                                        |cling.nvim-cling.nvim-usage|
-  - Configuration                        |cling.nvim-cling.nvim-configuration|
-  - Examples                                  |cling.nvim-cling.nvim-examples|
-2. Links                                                    |cling.nvim-links|
-
-==============================================================================
-1. cling.nvim                                          *cling.nvim-cling.nvim*
+  - Installation                                     |cling.nvim-installation|
+  - Usage                                                   |cling.nvim-usage|
+  - Configuration                                   |cling.nvim-configuration|
+  - Examples                                             |cling.nvim-examples|
 
 
+`cling.nvim` implements a customisable and thin CLI wrapper around executable
+binaries in Neovim.
 
-`cling.nvim` allows you to wrap CLI commands, providing structured output
-buffers and recursive help-based completions.
+It can be used to quickly execute terminal commands: - without leaving the
+Neovim context via multiplexing or `Ctrl+z`, - without losing the text
+formatting of the command outputs, - and also to interact with the output of
+those commands as a text-buffer.
+
+The plugin can also be configured to wrap CLI commands that you commonly use
+(like `jj`, `docker`, etc.) and: - automatically generate tab-completions in
+Neovim, - implement custom keymaps for those wrapped CLI output buffers.
 
 
-INSTALLATION                              *cling.nvim-cling.nvim-installation*
+  [!NOTE]
+  Autogenerating tab-completions in Neovim is an experimental feature.
+  It may not work for all available CLI tools as there is standard way to
+  implement subcommands and completion functions in Bash.
+
+INSTALLATION                                         *cling.nvim-installation*
 
 Using lazy.nvim <https://github.com/folke/lazy.nvim>:
 
@@ -36,7 +44,7 @@ Using lazy.nvim <https://github.com/folke/lazy.nvim>:
 <
 
 
-USAGE                                            *cling.nvim-cling.nvim-usage*
+USAGE                                                       *cling.nvim-usage*
 
 
 THE CLING COMMAND ~
@@ -47,7 +55,7 @@ point for executing shell commands within the plugin’s environment:
 - **:Cling**: Opens an input prompt to enter a shell command interactively.
 - **:Cling with-env**: Executes command with an `.env` file assigned interactively.
 - **:Cling last**: Executes the last executed command with `.env`.
-- **:Cling – **: Executes the command, treating everything after `--` as the command string. This is useful if your command contains flags that might be misinterpreted.
+- **:Cling -- <command>**: Executes the command, treating everything after `--` as the command string. This defaults to executing in current working directory.
 
 
 OUTPUT BUFFER KEYMAPS ~
@@ -59,7 +67,7 @@ terminal-filetype buffer. The following default keymaps are available:
 - **<CR> (Enter)**: Smart file navigation. If the cursor is on a file path (common in `grep`, `ls`, or compiler output), pressing Enter will attempt to open that file in the previous window. It supports `file:line:col` formats to jump directly to the specific location.
 
 
-CONFIGURATION                            *cling.nvim-cling.nvim-configuration*
+CONFIGURATION                                       *cling.nvim-configuration*
 
 You can define custom wrappers for your CLI tools in the `setup` function.
 Wrappers allow you to create specific Neovim user commands (e.g., `:JJ`,
@@ -90,12 +98,16 @@ your wrappers:
 
 
 
-EXAMPLES                                      *cling.nvim-cling.nvim-examples*
+EXAMPLES                                                 *cling.nvim-examples*
 
-Wrapping Jujutsu (jj) ~
+
+WRAPPING JUJUTSU (JJ) WITH CUSTOM KEYMAPS ~
 
 This example shows how to wrap the Jujutsu <https://github.com/martinvonz/jj>
-VCS. It uses the `completion_cmd` method to generate completions dynamically.
+VCS and to implement a custom keymap to send the outputs of `jj show` to a
+quickfix list.
+
+It uses the `completion_cmd` method to generate completions dynamically.
 
 >lua
     return {
@@ -191,25 +203,35 @@ VCS. It uses the `completion_cmd` method to generate completions dynamically.
     }
 <
 
-Other Completion Examples ~
+
+DIFFERENT METHODS OF GENERATING TAB-COMPLETION ~
+
+Generating tab-completions can be achieved through following 4 methods:
 
 >lua
     wrappers = {
-      -- Method 1: Recursive Help Crawling
+        -- Method 1: Recursive Help Crawling
         {
             binary = "docker",
             command = "Docker",
             help_cmd = "--help",
         },
       
-      -- Method 3: Local File
+        -- Method 2: Completion Command
+        {
+            binary = "jj",
+            command = "JJ",
+            completion_cmd = "jj util completion bash",
+        },
+    
+        -- Method 3: Local File
         {
             binary = "git",
             command = "Git",
             completion_file = "/usr/share/bash-completion/completions/git",
         },
     
-      -- Method 4: Remote URL (requires curl)
+        -- Method 4: Remote URL (requires curl)
         {
             binary = "eza",
             command = "Eza",
@@ -217,12 +239,6 @@ Other Completion Examples ~
         },
     }
 <
-
-==============================================================================
-2. Links                                                    *cling.nvim-links*
-
-1. *GitHub Workflow Status*: https://img.shields.io/github/actions/workflow/status/juniorsundar/cling.nvim/lint-test.yml?branch=main&style=for-the-badge
-2. *Lua*: https://img.shields.io/badge/Made%20with%20Lua-blueviolet.svg?style=for-the-badge&logo=lua
 
 Generated by panvimdoc <https://github.com/kdheepak/panvimdoc>
 
