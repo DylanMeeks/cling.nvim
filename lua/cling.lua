@@ -117,13 +117,14 @@ end
 
 --- Prompts for an environment file and sets it for the next command.
 function M.with_env()
-    local env_file = vim.fn.input('Path to .env file: ', core.last_env or vim.fs.joinpath(vim.fn.getcwd(), ".env"), 'file')
+    local env_file =
+        vim.fn.input("Path to .env file: ", core.last_env or vim.fs.joinpath(vim.fn.getcwd(), ".env"), "file")
     if env_file == nil or env_file == "" then
         vim.notify("Cancelled", vim.log.levels.WARN)
         return
     end
     core.last_env = env_file
-    M.on_cli_command({ fargs = {} })
+    M.on_cli_command { fargs = {} }
 end
 
 --- Re-runs the last executed command.
