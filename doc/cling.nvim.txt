@@ -1,8 +1,9 @@
-*cling.nvim.txt*       For Neovim >= 0.10.0       Last change: 2026 January 02
+*cling.nvim.txt*       For Neovim >= 0.10.0       Last change: 2026 January 04
 
 ==============================================================================
 Table of Contents                               *cling.nvim-table-of-contents*
 
+  - Requirements                                     |cling.nvim-requirements|
   - Installation                                     |cling.nvim-installation|
   - Usage                                                   |cling.nvim-usage|
   - Configuration                                   |cling.nvim-configuration|
@@ -28,6 +29,14 @@ Neovim, - implement custom keymaps for those wrapped CLI output buffers.
   implement subcommands and completion functions in Bash. If such as instance is
   encountered, please raise an Issue ticket.
 
+REQUIREMENTS                                         *cling.nvim-requirements*
+
+- Neovim 0.10+
+- `bash-completion`: Many CLI tools’ completion scripts depend on this.
+- `bash` _(obviously)_
+- `curl` (optional) for fetching remote completion scripts (Method 4).
+
+
 INSTALLATION                                         *cling.nvim-installation*
 
 Using lazy.nvim <https://github.com/folke/lazy.nvim>:
@@ -37,8 +46,14 @@ Using lazy.nvim <https://github.com/folke/lazy.nvim>:
         "juniorsundar/cling.nvim",
         config = function()
             require("cling").setup({
-                -- Add your wrappers here (see Configuration below)
-                wrappers = {}
+                wrappers = {
+                    {
+                        binary = "jj",
+                        command = "JJ",
+                        completion_cmd = "jj util completion bash",
+                    },
+                    -- {}, ...
+                }
             })
         end,
     }
