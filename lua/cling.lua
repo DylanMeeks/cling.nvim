@@ -130,15 +130,15 @@ end
 function M.on_cli_command(args)
     local fargs = args.fargs
     if #fargs == 0 then
-        local cmd = vim.fn.input("Cling command: ", core.last_cmd or "")
-        if cmd == nil or cmd == "" then
+        local ok, cmd = pcall(vim.fn.input, "Cling command: ", core.last_cmd or "")
+        if not ok or not cmd or cmd == "" then
             vim.notify("Cancelled", vim.log.levels.WARN)
             return
         end
 
         local default_cwd = core.last_cwd or vim.fn.getcwd()
-        local cwd = vim.fn.input("CWD: ", default_cwd, "dir")
-        if cwd == nil or cwd == "" then
+        local ok, cwd = pcall(vim.fn.input, "CWD: ", default_cwd, "dir")
+        if not ok or not cwd or cwd == "" then
             vim.notify("Cancelled", vim.log.levels.WARN)
             return
         end
